@@ -31,21 +31,21 @@ namespace toDoList.API.Controllers
         public async Task<ActionResult> DeleteById([FromRoute] int id)
         {
             await service.DeleteAsync(id);
-            return Accepted(id);
+            return Accepted();
         }
         [HttpPost]
-        public async Task<ActionResult> Add([FromBody] ProjectDTO project)
+        public async Task<ActionResult> Add([FromBody] CreateProject project)
         {
             var id = await service.AddAsync(project);
 
             return Created($"api/project/{id}", project);
         }
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Update([FromRoute] int id, [FromBody] ProjectDTO project)
+        [HttpPut]
+        public async Task<ActionResult> Update([FromBody] ProjectDTO project)
         {
             var result = service.UpdateAsync(project);
             if (result == null) return NotFound();
-            return Accepted($"api/project/{id}", project);
+            return Accepted();
         }
     }
 }

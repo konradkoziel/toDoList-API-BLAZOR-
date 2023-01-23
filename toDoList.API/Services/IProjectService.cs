@@ -6,8 +6,8 @@ namespace toDoList.API.Services
     {
         Task<List<ProjectDTO>> GetAllAsync();
         Task<ProjectDTO> GetByIdAsync(int id);
-        Task<int> AddAsync(ProjectDTO project);
-        Task<ProjectDTO> UpdateAsync(ProjectDTO project);
+        Task<int> AddAsync(CreateProject project);
+        Task UpdateAsync(ProjectDTO project);
         Task DeleteAsync(int id);
     }
 }

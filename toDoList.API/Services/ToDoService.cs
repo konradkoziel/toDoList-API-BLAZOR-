@@ -51,7 +51,7 @@ namespace toDoList.API.Services
             return result;
         }
 
-        public async Task<ToDoDTO> UpdateAsync(int id, ToDoDTO toDoDTO)
+        public async Task UpdateAsync(int id, ToDoDTO toDoDTO)
         {
             var toDo = await context.ToDos.FindAsync(id);
             if (toDo != null)
@@ -63,7 +63,6 @@ namespace toDoList.API.Services
                 await context.SaveChangesAsync();
             }
 
-            return toDoDTO;
         }
     }
 }

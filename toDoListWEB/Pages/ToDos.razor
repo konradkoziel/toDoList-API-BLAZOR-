@@ -59,11 +59,12 @@
 </button>
 
 @code {
+
     [Parameter]
     public int Id { get; set; }
+
     [Parameter]
     public int? projectId { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {

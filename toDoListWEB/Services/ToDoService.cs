@@ -57,11 +57,5 @@ namespace toDoListWEB.Services
 
         }
 
-        public async Task GetParameter(int id)
-        {
-
-        }
-
-
     }
 }

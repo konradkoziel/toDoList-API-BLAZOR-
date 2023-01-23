@@ -15,7 +15,7 @@ namespace toDoList.API.Services
             this.context = context;
             this.mapper = mapper;
         }
-        public async Task<int> AddAsync(ProjectDTO project)
+        public async Task<int> AddAsync(CreateProject project)
         {
             var result = mapper.Map<Project>(project);
             await context.AddAsync(result);
@@ -33,25 +33,22 @@ namespace toDoList.API.Services
         public async Task<List<ProjectDTO>> GetAllAsync()
         {
             var projects = await context.Projects.ToListAsync();
-
             var result = mapper.Map<List<ProjectDTO>>(projects);
             return result;
         }
 
         public async Task<ProjectDTO> GetByIdAsync(int id)
         {
-
-            var result = await context.Projects.FindAsync(id);
-            var project = mapper.Map<ProjectDTO>(result);
-            return project;
+            var project = await context.Projects.FindAsync(id);
+            var result = mapper.Map<ProjectDTO>(project);
+            return result;
         }
 
-        public async Task<ProjectDTO> UpdateAsync(ProjectDTO projectDTO)
+        public async Task UpdateAsync(ProjectDTO projectDTO)
         {
             var project = mapper.Map<Project>(projectDTO);
             context.Update(project);
             await context.SaveChangesAsync();
-            return projectDTO;
         }
     }
 }
