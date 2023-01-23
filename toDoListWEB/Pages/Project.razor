@@ -1,0 +1,96 @@
+﻿@page "/project"
+@page "/project/{projectId:int}"
+@inject IProjectService ProjectService
+@inject NavigationManager NavigationManager
+
+@if (projectId is null)
+{
+    <PageTitle>Create a new Project</PageTitle>
+    <h3>Create a new Project</h3>
+    <EditForm Model="project" OnSubmit="HandleSubmit">
+        <div>
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="project.Name" class="form-control" />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">@btnText</button>
+            <button type="button" class="btn btn-danger"
+            @onclick="ShowProjects">
+                Back
+
+
+        </button>
+    </EditForm>
+}
+else
+{
+    <PageTitle>Edit @project.Name</PageTitle>
+    <h3>Edit </h3>
+
+        <EditForm Model="project" OnSubmit="HandleSubmit">
+        <div>
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="project.Name" class="form-control" />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">@btnText</button>
+            <button type="button" class="btn btn-danger"
+            @onclick="DeleteProject">
+                Delete Project
+
+
+        </button>
+    </EditForm>
+}
+
+
+
+@code {
+    [Parameter]
+    public int? projectId { get; set; }
+
+
+    string btnText = string.Empty;
+
+    toDoList.Models.Project project =
+        new toDoList.Models.Project { Name = "New Project" };
+
+    protected override void OnInitialized()
+    {
+        btnText = projectId == null ? "Save New Project" : "Update Project";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (projectId is not null)
+        {
+            var result = await ProjectService.GetByIdAsync((int)projectId);
+            if (result is not null)
+                project = result;
+            else
+                NavigationManager.NavigateTo("/Project");
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (projectId is null)
+        {
+            await ProjectService.AddAsync(project);
+        }
+        else
+        {
+            await ProjectService.UpdateAsync((int)projectId, project);
+        }
+    }
+
+    async Task DeleteProject()
+    {
+        await ProjectService.DeleteAsync(project.Id);
+    }
+
+    void ShowProjects()
+    {
+        NavigationManager.NavigateTo("/projects");
+    }
+}

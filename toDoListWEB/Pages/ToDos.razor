@@ -1,0 +1,92 @@
+﻿@page "/project/{projectId:int}/toDos"
+
+
+@inject IToDoService ToDoService
+@inject NavigationManager NavigationManager
+
+<h3>ToDos</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Completed</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ToDo in ToDoService.toDos)
+        {
+            <tr>
+                <td>@ToDo.Name</td>
+                <td>@ToDo.Description</td>
+                <td>
+                    @if (!ToDo.IsDone)
+                    {
+                        <p>Not completed</p>
+                    }
+                    else
+                    {
+                        <p>Completed</p>
+                    }
+                </td>
+                <td>
+                    <button type="button" button class="btn btn-success"
+                        @onclick="(() => UpdateComplete(ToDo.Id, ToDo))">
+                        <i class="oi oi-check"></i>
+                    </button>
+                </td>
+                <td>
+                    <button type="button" button class="btn btn-warning"
+                        @onclick="(() => ShowToDo(ToDo.ProjectId, ToDo.Id))">
+                        Edit
+                    </button>
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-success"
+        @onclick="(() => CreateNewToDo((int)projectId))">
+    Create New ToDo
+</button>
+<button class="btn btn-secondary"
+        @onclick="(() => ShowProjects())">
+    Back to projects
+</button>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public int? projectId { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ToDoService.GetAllByIdAsync((int)projectId);
+    }
+
+    void ShowToDo(int projectId, int id)
+    {
+        NavigationManager.NavigateTo($"/project/{projectId}/ToDo/{id}");
+    }
+
+    void CreateNewToDo(int projectId)
+    {
+        NavigationManager.NavigateTo($"/project/{projectId}/ToDo");
+    }
+    void ShowProjects()
+    {
+        NavigationManager.NavigateTo("/projects");
+    }
+    async Task UpdateComplete(int id, toDoList.Models.ToDo toDo)
+    {
+     
+        toDo.IsDone = true;
+        await ToDoService.UpdateAsync(id, toDo);
+    }
+}

@@ -1,0 +1,107 @@
+﻿@page "/project/{projectId:int}/ToDo"
+@page "/project/{projectId:int}/ToDo/{id:int}"
+@inject IToDoService ToDoService
+@inject NavigationManager NavigationManager
+
+
+
+@if (Id is null)
+{
+    <PageTitle>Create a new ToDo</PageTitle>
+    <h3>Create a new ToDo</h3>
+    <EditForm Model="toDo" OnSubmit="HandleSubmit">
+        <div>
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="toDo.Name" class="form-control" />
+        </div>
+        <div>
+            <label for="Description">Description</label>
+            <InputText id="Description" @bind-Value="toDo.Description" class="form-control" />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">@btnText</button>
+        <button type="button" class="btn btn-danger"
+            @onclick="ShowToDos">
+            Back
+
+
+        </button>
+    </EditForm>
+}
+else
+{
+    <PageTitle>Edit @toDo.Name</PageTitle>
+    <h3>Edit </h3>
+
+    <EditForm Model="toDo" OnSubmit="HandleSubmit">
+        <div>
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="toDo.Name" class="form-control" />
+        </div>
+        <div>
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="toDo.Description" class="form-control" />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">@btnText</button>
+        <button type="button" class="btn btn-danger"
+            @onclick="DeleteToDo">
+            Delete Task
+        </button>
+    </EditForm>
+}
+
+
+@code {
+    [Parameter]
+    public int? projectId { get; set; }
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    toDoList.Models.ToDo toDo =
+        new toDoList.Models.ToDo { Name = "New name", Description = "New description"};
+
+    protected override void OnInitialized()
+    {
+        btnText = Id == null ? "Save New ToDo" : "Update ToDo";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await ToDoService.GetByIdAsync((int)projectId, (int)Id);
+            if (result is not null)
+                toDo = result;
+            else
+                NavigationManager.NavigateTo("/project/{projectId:int}/toDos");
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id is null)
+        {
+            await ToDoService.AddAsync((int)projectId, toDo);
+            NavigationManager.NavigateTo($"/project/{projectId}/toDos");
+        }
+        else
+        {
+            await ToDoService.UpdateAsync(toDo.Id, toDo);
+            NavigationManager.NavigateTo($"/project/{projectId}/toDos");
+        }
+    }
+
+    async Task DeleteToDo()
+    {
+        await ToDoService.DeleteAsync((int)Id);
+        NavigationManager.NavigateTo($"/project/{projectId}/toDos");
+    }
+
+    void ShowToDos()
+    {
+        NavigationManager.NavigateTo("/ToDos");
+    }
+}
