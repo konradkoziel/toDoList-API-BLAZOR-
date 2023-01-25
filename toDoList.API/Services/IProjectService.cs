@@ -9,5 +9,7 @@ namespace toDoList.API.Services
         Task<int> AddAsync(CreateProject project);
         Task UpdateAsync(ProjectDTO project);
         Task DeleteAsync(int id);
+        Task<bool> IsAllToDosDoneAsync(int id);
+        Task SetIsDoneAsync(int id);
     }
 }

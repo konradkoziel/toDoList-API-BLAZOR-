@@ -23,7 +23,7 @@ namespace toDoList.API.Services
             toDo.ProjectId = id;
             toDo.Project = project;
             await context.AddAsync(toDo);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return toDo.Id;
         }
 
@@ -31,7 +31,7 @@ namespace toDoList.API.Services
         {
             var result = await context.ToDos.FindAsync(id);
             context.Remove(result);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ToDo>> GetAllAsync()
@@ -40,20 +40,21 @@ namespace toDoList.API.Services
             return result;
         }
 
-        public async Task<List<ToDo>> GetAllByIdAsync(int id)
+        public async Task<List<ToDo>> GetAllByProjectIdAsync(int id)
         {
             var result = await context.ToDos.Where(p => p.ProjectId == id).ToListAsync();
             return result;
         }
-        public async Task<ToDo> GetByIdAsync(int projectId, int id)
+
+        public async Task<ToDo> GetByIdAsync(int id)
         {
             var result = await context.ToDos.FindAsync(id);
             return result;
         }
 
-        public async Task UpdateAsync(int id, ToDoDTO toDoDTO)
+        public async Task UpdateAsync(ToDoDTO toDoDTO)
         {
-            var toDo = await context.ToDos.FindAsync(id);
+            var toDo = await context.ToDos.FindAsync(toDoDTO.Id);
             if (toDo != null)
             {
                 toDo.Name = toDoDTO.Name;
@@ -62,7 +63,13 @@ namespace toDoList.API.Services
 
                 await context.SaveChangesAsync();
             }
+        }
 
+        public async Task SetIsDoneAsync(int id)
+        {
+            var toDo = await context.ToDos.FindAsync(id);
+            toDo.IsDone = true;
+            await context.SaveChangesAsync();
         }
     }
 }

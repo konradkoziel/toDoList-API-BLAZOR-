@@ -19,7 +19,7 @@ namespace toDoList.API.Services
         {
             var result = mapper.Map<Project>(project);
             await context.AddAsync(result);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             return result.Id;
         }
 
@@ -27,7 +27,7 @@ namespace toDoList.API.Services
         {
             var result = await context.Projects.FindAsync(id);
             context.Remove(result);
-            context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         public async Task<List<ProjectDTO>> GetAllAsync()
@@ -49,6 +49,25 @@ namespace toDoList.API.Services
             var project = mapper.Map<Project>(projectDTO);
             context.Update(project);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsAllToDosDoneAsync(int id)
+        {
+            var project = await context.Projects.FindAsync(id);
+            var toDos = await context.ToDos.Where(x => x.ProjectId == id).ToListAsync();
+            if (project != null && toDos.Any() && toDos.All(x => x.IsDone == true))
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        public async Task SetIsDoneAsync(int id)
+        {
+            var project = await context.Projects.FindAsync(id);
+            project.IsDone = true;
+            await context.SaveChangesAsync();
+
         }
     }
 }

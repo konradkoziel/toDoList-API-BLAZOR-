@@ -5,7 +5,7 @@ using toDoList.API.Services;
 
 namespace toDoList.API.Controllers
 {
-    [Route($"api/toDo")]
+    [Route($"api/ToDos")]
     [ApiController]
     public class ToDoController : ControllerBase
     {
@@ -21,38 +21,49 @@ namespace toDoList.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<List<ToDoDTO>>> GetAllByprojectId([FromRoute] int id)
+        [HttpGet("Project/{projectId}")]
+        public async Task<ActionResult<List<ToDoDTO>>> GetAllByProjectId([FromRoute] int projectId)
         {
-            var result = await service.GetAllByIdAsync(id);
+            var result = await service.GetAllByProjectIdAsync(projectId);
             if (result == null) return NotFound();
             return Ok(result);
         }
-        [HttpGet("{projectId}/{id}")]
-        public async Task<ActionResult<ToDoDTO>> GetById([FromRoute] int id, [FromRoute] int projectId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ToDoDTO>> GetById([FromRoute] int id)
         {
-            var result = await service.GetByIdAsync(projectId, id);
+            var result = await service.GetByIdAsync(id);
             if (result == null) return NotFound();
             return Ok(result);
         }
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteById([FromRoute] int id)
         {
+            var result = await service.GetByIdAsync(id);
+            if (result == null) return NotFound();
             await service.DeleteAsync(id);
             return Accepted(id);
         }
-        [HttpPost("{id}")]
-        public async Task<ActionResult> Add([FromRoute] int id, [FromBody] CreateToDo createToDo)
+        [HttpPost("{projectId}")]
+        public async Task<ActionResult> Add([FromRoute] int projectId, [FromBody] CreateToDo createToDo)
         {
-            var toDoId = await service.AddAsync(id, createToDo);
+            var toDoId = await service.AddAsync(projectId, createToDo);
             return Created($"api/ToDo/{toDoId}", createToDo);
         }
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Update([FromRoute] int id, [FromBody] ToDoDTO ToDo)
+        [HttpPut]
+        public async Task<ActionResult> Update([FromBody] ToDoDTO ToDo)
         {
-            var result = service.UpdateAsync(id, ToDo);
-            if (result == null) return NotFound();
+            if (ToDo == null) return BadRequest();
+            await service.UpdateAsync(ToDo);
             return Accepted($"api/ToDo/", ToDo);
+        }
+
+        [HttpPatch("isDone/{id}")]
+        public async Task<ActionResult> SetIsDone([FromRoute] int id)
+        {
+            var toDo = await service.GetByIdAsync(id);
+            if (toDo == null) return NotFound();
+            await service.SetIsDoneAsync(id);
+            return Ok();
         }
     }
 }

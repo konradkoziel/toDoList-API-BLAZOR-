@@ -4,7 +4,7 @@ using toDoList.API.Services;
 
 namespace toDoList.API.Controllers
 {
-    [Route("api/project")]
+    [Route("api/Project")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
@@ -30,22 +30,34 @@ namespace toDoList.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteById([FromRoute] int id)
         {
+            var result = await service.GetByIdAsync(id);
+            if (result == null) return NotFound();
             await service.DeleteAsync(id);
-            return Accepted();
+            return Ok();
         }
         [HttpPost]
         public async Task<ActionResult> Add([FromBody] CreateProject project)
         {
-            var id = await service.AddAsync(project);
-
-            return Created($"api/project/{id}", project);
+            var projectId = await service.AddAsync(project);
+            return Created($"api/project/{projectId}", project);
         }
         [HttpPut]
         public async Task<ActionResult> Update([FromBody] ProjectDTO project)
         {
-            var result = service.UpdateAsync(project);
-            if (result == null) return NotFound();
-            return Accepted();
+            await service.UpdateAsync(project);
+            return Ok();
+        }
+
+        [HttpPatch("isDone/{id}")]
+        public async Task<ActionResult> SetIsDone([FromRoute] int id)
+        {
+            var isAllDone = await service.IsAllToDosDoneAsync(id);
+            if (isAllDone)
+            {
+                await service.SetIsDoneAsync(id);
+                return Ok();
+            }
+            return BadRequest("Project must have at least one task and all must be completed!");
         }
     }
 }

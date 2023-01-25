@@ -6,10 +6,11 @@ namespace toDoList.API.Services
     public interface IToDoService
     {
         Task<IEnumerable<ToDo>> GetAllAsync();
-        Task<List<ToDo>> GetAllByIdAsync(int id);
-        Task<ToDo> GetByIdAsync(int projectId, int id);
+        Task<List<ToDo>> GetAllByProjectIdAsync(int id);
+        Task<ToDo> GetByIdAsync(int id);
         Task<int> AddAsync(int id, CreateToDo createToDo);
-        Task UpdateAsync(int id, ToDoDTO ToDo);
+        Task UpdateAsync(ToDoDTO ToDo);
         Task DeleteAsync(int id);
+        Task SetIsDoneAsync(int id);
     }
 }
